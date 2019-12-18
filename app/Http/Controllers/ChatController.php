@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\User;
 use App\Message;
 use App\Group;
@@ -33,38 +34,25 @@ class ChatController extends Controller
         return view('chat', compact('users', 'my_messages', 'my_groups'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function getMess(Request $request)
     {
-        //
-    }
+        $id_user_received = $request->id;
+        $my_groups = $this->group->getMy_Group();
+        $users = $this->user->getUsers();
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $my_messages = Message::where([
+            ['id_user_send', '=', Auth::user()->id],
+            ['id_user_received', '=', $id_user_received],
+        ])->orWhere([
+            ['id_user_received', '=', Auth::user()->id],
+            ['id_user_send', '=', $id_user_received],
+        ])->get();
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+        $returnHTML = \view('chat', compact('users', 'my_messages', 'my_groups'))->renderSections()['content'];
 
+        return response()->json(array('success' => true, 'html'=>$returnHTML));
+
+    }
     /**
      * Show the form for editing the specified resource.
      *
