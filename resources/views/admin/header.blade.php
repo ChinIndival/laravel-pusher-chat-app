@@ -28,33 +28,8 @@
                         @endif
                     @else
                         <div class="row" style="position: absolute; left: 600px;">
-{{--                            <a class="nav-link" href="{{ route('users.index') }}">{{ __('ユーザーリスト') }}</a>--}}
-{{--                            <a class="nav-link" href="{{ route('positions.index') }}">{{ __('部分') }}</a>--}}
-{{--                            <a class="nav-link" href="{{ route('chat') }}">{{ __('Chat') }}</a>--}}
                         </div>
-{{--                        <form role="search" method="get" id="searchform" action="{{ route('search') }}" class="form">--}}
-{{--                            <!-- <input name="cx" type="hidden"/> -->--}}
-{{--                            <!-- <input value="FORID:11" name="cof" type="hidden"/> -->--}}
-{{--                            <input type="text" value="" name="key" id="s" placeholder="キーワードを入力してください" size="40px" required />--}}
-{{--                            <button type="submit" class="button1">探索</button>--}}
-{{--                        </form>--}}
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                {{ Auth::user()->name }} <span class="caret"></span>
-                            </a>
-
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('logout') }}"
-                                   onclick="event.preventDefault();
-                                                 document.getElementById('logout-form').submit();">
-                                    {{ __('Logout') }}
-                                </a>
-
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                    @csrf
-                                </form>
-                            </div>
-                        </li>
+                        {{--  --}}
                     @endguest
                 </ul>
             </div>

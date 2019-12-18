@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use App\Message;
+use App\Group;
 use Illuminate\Http\Request;
 
 class ChatController extends Controller
@@ -11,9 +14,23 @@ class ChatController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    protected $user;
+    protected $message;
+    protected $group;
+
+    public function __construct(User $user, Message $message, Group $group)
+    {
+        $this->user = $user;
+        $this->group = $group;
+        $this->message = $message;
+    }
     public function index()
     {
-        //
+        $users = $this->user->getUsers();
+        $my_messages = $this->message->getMy_Message();
+        $my_groups = $this->group->getMy_Group();
+
+        return view('chat', compact('users', 'my_messages', 'my_groups'));
     }
 
     /**
