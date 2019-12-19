@@ -41,5 +41,11 @@ class UsersTableSeeder extends Seeder
             'avatar' => 'user-profile.png',
             'password' => bcrypt('tinhhang'),
         ]);
+        DB::table('users')->insert([
+            'name' => 'tinhhang',
+            'email' => 'tinh6@gmail.com',
+            'avatar' => 'user-profile.png',
+            'password' => bcrypt('tinhhang'),
+        ]);
     }
 }
