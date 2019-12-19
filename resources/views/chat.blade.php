@@ -3,7 +3,8 @@
 @section('title', 'Chat')
 
 @section('content')
-    <input id="id_user_received" hidden>
+    <input id="id_user_received" value="{{ Auth::user()->id }}" hidden>
+    <input id="id_group" hidden>
     <input id="start_id" value="{{ Auth::user()->id }}" hidden>
     <div id="mmm">
         <div class="container">
@@ -91,7 +92,7 @@
                             @endif
                         @endforeach
                         @foreach($my_groups as $value)
-                            <div class="chat_list " onclick="getId({{ $value->id }})">
+                            <div class="chat_list " onclick="getIdGroup({{ $value->id }})" style="cursor: pointer">
                                 <div class="chat_people">
                                     <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
                                     <div class="chat_ib">
@@ -167,17 +168,39 @@
             });
         };
 
+        function getIdGroup(id) {
+            $.ajax({
+                method: 'GET', // Type of response and matches what we said in the route
+                url: '/getMessGroup', // This is the url we gave in the route
+                data: {_token: CSRF_TOKEN,id: id}, // a JSON object to send back
+
+                success: function(response){ // What to do if we succeed
+                        console.log(response.html);
+                        // $('.container').remove()
+                        $('#mmm').html(response.html);
+                        $('#id_user_received').removeAttr('value', id);
+                        $('#id_group').attr('value', id);
+
+                },
+                error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
+                    console.log(JSON.stringify(jqXHR));
+
+                    alert('編集しませんでした');
+                }
+            });
+        };
+
         $(document).on('click', '#send_chat', function() {
-            var id = $('#start_id').val();
+            // var id = $('#start_id').val();
             var id = $('#id_user_received').val();
-            // alert(id);
+            var id_group = $('#id_group').val();
             var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
             var id_user_send = $('#id_user_send').val();
             var message = $('#message').val();
             $.ajax({
                 url: "/storeMess",
                 method: "POST",
-                data: { _token: CSRF_TOKEN, id: id, message: message, id_user_send: id_user_send},
+                data: { _token: CSRF_TOKEN, id: id, message: message, id_user_send: id_user_send, id_group: id_group},
                 success: function (response) {
                     $("#mmm").html(response.html);
                 },
@@ -199,15 +222,16 @@
             });
             channel.bind('App\\Events\\Notify', function (data) {
                 var id = $('#start_id').val();
-                    var id = $('#id_user_received').val();
-                    // alert(id);
-                    var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-                    var id_user_send = $('#id_user_send').val();
+                var id = $('#id_user_received').val();
+                var id_group = $('#id_group').val();
+                // alert(id_group);
+                var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+                var id_user_send = $('#id_user_send').val();
                 // alert(data.content);
                 $.ajax({
                     url: "/getMess2",
                     method: "GET",
-                    data: { _token: CSRF_TOKEN, id: id, id_user_send: id_user_send},
+                    data: { _token: CSRF_TOKEN, id: id, id_user_send: id_user_send , id_group: id_group},
                     success: function (response) {
                         $("#mmm").html(response.html);
                     },
