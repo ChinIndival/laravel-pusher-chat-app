@@ -23,4 +23,6 @@ Route::group(['middleware' => ['auth']], function ()
 {
     Route::get('/chat', 'ChatController@index')->name('chat');
     Route::get('/getMess', 'ChatController@getMess')->name('getMess');
+    Route::get('/getMess2', 'ChatController@getMess2')->name('getMess2');
+    Route::post('/storeMess', 'ChatController@storeMess')->name('storeMess');
 });

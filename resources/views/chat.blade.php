@@ -3,6 +3,8 @@
 @section('title', 'Chat')
 
 @section('content')
+    <input id="id_user_received" hidden>
+    <input id="start_id" value="{{ Auth::user()->id }}" hidden>
     <div id="mmm">
         <div class="container">
             <h3 class=" text-center">Messaging</h3>
@@ -21,14 +23,15 @@
                             </span> </div>
                         </div>
                     </div>
-                    <div id="tt" class="inbox_chat">
+                    <div class="inbox_chat">
                         @foreach($users as $value)
-                            {{-- <input id="id_user_received" value="{{ $value->id }}" hidden> --}}
+                            <input id="id_user_send" value="{{ Auth::user()->id }}" hidden>
                             @if($value->id == Auth::user()->id)
-                                <div  class="chat_list" onclick="getId({{ $value->id }})">
+                                <div class="chat_list" onclick="getId({{ $value->id }})" style="cursor: pointer">
                                     <div class="chat_people">
                                         <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
                                         <div class="chat_ib">
+                                            <h5>My chat
                                             @if((DB::table('messages')->where([
                                                 ['id_user_send', '=', Auth::user()->id],
                                                 ['id_user_received', '=', $value->id],
@@ -36,7 +39,7 @@
                                                 ['id_user_received', '=', Auth::user()->id],
                                                 ['id_user_send', '=', $value->id],
                                             ])->orderBy('id', 'DESC')->first()) != null)
-                                                <h5>My chat <span class="chat_date">{{ (DB::table('messages')->where([
+                                                <span class="chat_date">{{ (DB::table('messages')->where([
                                                     ['id_user_send', '=', Auth::user()->id],
                                                     ['id_user_received', '=', $value->id],
                                                 ])->orWhere([
@@ -55,7 +58,7 @@
                                     </div>
                                 </div>
                             @else
-                                <div class="chat_list" onclick="getId({{ $value->id }})">
+                                <div class="chat_list" onclick="getId({{ $value->id }})" style="cursor: pointer">
                                     <div class="chat_people">
                                         <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
                                         <div class="chat_ib">
@@ -94,9 +97,9 @@
                                     <div class="chat_ib">
                                         <h5>{{ $value->name }}
                                         @if((DB::table('messages')->where('id_group', $value->id)->orderBy('id', 'DESC')->first()) != null)
-                                                <span class="chat_date">{{ (DB::table('messages')->where('id_group', $value->id)->orderBy('id', 'DESC')->first())->created_at }}</span></h5>
-                                                <p>{{ (DB::table('messages')->where('id_group', $value->id)->orderBy('id', 'DESC')->first())->content }}</p>
-                                            @endif
+                                            <span class="chat_date">{{ (DB::table('messages')->where('id_group', $value->id)->orderBy('id', 'DESC')->first())->created_at }}</span></h5>
+                                            <p>{{ (DB::table('messages')->where('id_group', $value->id)->orderBy('id', 'DESC')->first())->content }}</p>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -128,8 +131,9 @@
                     </div>
                     <div class="type_msg">
                         <div class="input_msg_write">
-                            <input type="text" class="write_msg" placeholder="Type a message" />
-                            <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+                            <input id="message" type="text" class="write_msg" placeholder="Type a message" />
+                            {{csrf_field()}}
+                            <button id="send_chat" class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
                         </div>
                     </div>
                 </div>
@@ -153,6 +157,7 @@
                         console.log(response.html);
                         // $('.container').remove()
                         $('#mmm').html(response.html);
+                        $('#id_user_received').attr('value', id);
                 },
                 error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
                     console.log(JSON.stringify(jqXHR));
@@ -160,8 +165,57 @@
                     alert('編集しませんでした');
                 }
             });
-            
-        }
-        
+        };
+
+        $(document).on('click', '#send_chat', function() {
+            var id = $('#start_id').val();
+            var id = $('#id_user_received').val();
+            // alert(id);
+            var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+            var id_user_send = $('#id_user_send').val();
+            var message = $('#message').val();
+            $.ajax({
+                url: "/storeMess",
+                method: "POST",
+                data: { _token: CSRF_TOKEN, id: id, message: message, id_user_send: id_user_send},
+                success: function (response) {
+                    $("#mmm").html(response.html);
+                },
+                error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
+                    console.log(JSON.stringify(jqXHR));
+                    alert('Can not send message!');
+                }
+            });
+        });
+        Pusher.logToConsole = true;
+            var pusher = new Pusher('4c7dc639409e505ada7d', {
+                cluster: "ap3",
+                useTLS: true
+            });
+            // alert('Dd');
+            var channel = pusher.subscribe('notify');
+            channel.bind('pusher:subscription_succeeded', function(members) {
+                // alert('successfully subscribed!');
+            });
+            channel.bind('App\\Events\\Notify', function (data) {
+                var id = $('#start_id').val();
+                    var id = $('#id_user_received').val();
+                    // alert(id);
+                    var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+                    var id_user_send = $('#id_user_send').val();
+                // alert(data.content);
+                $.ajax({
+                    url: "/getMess2",
+                    method: "GET",
+                    data: { _token: CSRF_TOKEN, id: id, id_user_send: id_user_send},
+                    success: function (response) {
+                        $("#mmm").html(response.html);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
+                        console.log(JSON.stringify(jqXHR));
+                        alert('Can not send message!');
+                    }
+                });
+            });
     </script>
 @endsection

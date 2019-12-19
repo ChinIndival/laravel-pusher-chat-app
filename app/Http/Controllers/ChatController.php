@@ -6,6 +6,7 @@ use Auth;
 use App\User;
 use App\Message;
 use App\Group;
+use App\Events\Notify;
 use Illuminate\Http\Request;
 
 class ChatController extends Controller
@@ -39,6 +40,54 @@ class ChatController extends Controller
         $id_user_received = $request->id;
         $my_groups = $this->group->getMy_Group();
         $users = $this->user->getUsers();
+
+        $my_messages = Message::where([
+            ['id_user_send', '=', Auth::user()->id],
+            ['id_user_received', '=', $id_user_received],
+        ])->orWhere([
+            ['id_user_received', '=', Auth::user()->id],
+            ['id_user_send', '=', $id_user_received],
+        ])->get();
+
+        $returnHTML = \view('chat', compact('users', 'my_messages', 'my_groups'))->renderSections()['content'];
+
+        return response()->json(array('success' => true, 'html'=>$returnHTML));
+
+    }
+
+    public function getMess2(Request $request)
+    {
+        $id_user_received = $request->id;
+        $my_groups = $this->group->getMy_Group();
+        $users = $this->user->getUsers();
+
+        $my_messages = Message::where([
+            ['id_user_send', '=', Auth::user()->id],
+            ['id_user_received', '=', $id_user_received],
+        ])->orWhere([
+            ['id_user_received', '=', Auth::user()->id],
+            ['id_user_send', '=', $id_user_received],
+        ])->get();
+
+        $returnHTML = \view('chat', compact('users', 'my_messages', 'my_groups'))->renderSections()['content'];
+
+        return response()->json(array('success' => true, 'html'=>$returnHTML));
+
+    }
+
+    public function storeMess(Request $request)
+    {
+        $id_user_received = $request->id;
+        // $id_user_send = $request->id_user_send;
+        $my_groups = $this->group->getMy_Group();
+        $users = $this->user->getUsers();
+
+        $message = new Message();
+        $message->id_user_send = $request->id_user_send;
+        $message->id_user_received = $id_user_received;
+        $message->content = $request->message;
+        $message->save();
+        event(new Notify($message));
 
         $my_messages = Message::where([
             ['id_user_send', '=', Auth::user()->id],
