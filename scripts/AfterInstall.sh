@@ -1,10 +1,10 @@
 #!/bin/bash 
-# cd /var/www/html/test 
+cd /var/www/html/chat
 # 
 # Run composer 
-# composer install 
+composer install 
 # 
 # Run artisan commands 
-# php /var/www/html/test/artisan migrate:refresh
+php /var/www/html/chat/artisan migrate:refresh
  
 # php /var/www/html/test/artisan db:seed 

@@ -113,7 +113,7 @@
                             <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
                                 <div class="received_msg">
                                     <div class="received_withd_msg">
-                                        <a>sd</a>
+                                        <a>Chat with : </a>
                                         {{-- <span class="time_date"><i>Sent at: {{ $value->created_at->format('Y-m-d H:m:s') }}</i></span> --}}
                                     </div>
                                 </div>

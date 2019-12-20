@@ -4,9 +4,9 @@ os: linux
 files:
     - source: /
       destination: /var/www/html/chat/
-# hooks:
-#   AfterInstall:
-#       - location: scripts/AfterInstall.sh
-#         timeout: 180
-#         runas: root
+hooks:
+  AfterInstall:
+      - location: scripts/AfterInstall.sh
+        timeout: 180
+        runas: root
 
