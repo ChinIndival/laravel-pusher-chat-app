@@ -21,7 +21,7 @@
                                     <input type="text" class="search-bar"  placeholder="Search" >
                                     <span class="input-group-addon">
                                     <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
-                                    </span> 
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -29,7 +29,7 @@
                             @foreach($users as $value)
                                 <input id="id_user_send" value="{{ Auth::user()->id }}" hidden>
                                 @if($value->id == Auth::user()->id)
-                                    <div class="chat_list" onclick="getId({{ $value->id }})" style="cursor: pointer">
+                                    <div class="chat_list active_chat" onclick="getId({{ $value->id }})" style="cursor: pointer">
                                         <div class="chat_people">
                                             <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
                                             <div class="chat_ib">
@@ -123,13 +123,13 @@
                                 <input type="text" class="search-bar"  placeholder="Search" >
                                 <span class="input-group-addon">
                                 <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
-                                </span> 
+                                </span>
                             </div>
                         </div>
                     </div>
                     <div class="mesgs">
-                    
-                        <div class="msg_history"> 
+
+                        <div class="msg_history">
                             <div id="chat">
                                 @foreach($my_messages as $value)
                                     @if($value->id_user_send != Auth::user()->id)
@@ -146,7 +146,7 @@
                                         <div class="outgoing_msg">
                                             <div class="sent_msg">
                                                 <p>{{ $value->content }}</p>
-                                                <span class="time_date"><i>Sent at: {{ $value->created_at->format('Y-m-d H:m:s') }}</i></span> 
+                                                <span class="time_date"><i>Sent at: {{ $value->created_at->format('Y-m-d H:m:s') }}</i></span>
                                             </div>
                                         </div>
                                     @endif
@@ -170,7 +170,7 @@
 @section('script')
     <script type="text/javascript">
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-        
+
         function getId(id) {
             $.ajax({
                 method: 'GET', // Type of response and matches what we said in the route
@@ -203,6 +203,7 @@
                         $('#mmm').html(response.html);
                         $('#id_user_received').removeAttr('value', id);
                         $('#id_group').attr('value', id);
+                        $('#').removeAttr('value', id);
 
                 },
                 error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
