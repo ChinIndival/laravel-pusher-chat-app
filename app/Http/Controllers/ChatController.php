@@ -143,9 +143,7 @@ class ChatController extends Controller
 
             $returnHTML = \view('chat', compact('users', 'my_messages', 'my_groups'))->renderSections()['content'];
         }
-        
         return response()->json(array('success' => true, 'html'=>$returnHTML));
-
     }
     /**
      * Show the form for editing the specified resource.

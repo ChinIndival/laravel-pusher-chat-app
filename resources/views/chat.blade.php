@@ -60,7 +60,7 @@
                                         </div>
                                     </div>
                                 @else
-                                    <div class="chat_list" onclick="getId({{ $value->id }})" style="cursor: pointer">
+                                    <div id="{{ $value->id }}" class="chat_list {{ $value->id }}" onclick="getId({{ $value->id }})" style="cursor: pointer">
                                         <div class="chat_people">
                                             <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
                                             <div class="chat_ib">
@@ -93,7 +93,7 @@
                                 @endif
                             @endforeach
                             @foreach($my_groups as $value)
-                                <div class="chat_list " onclick="getIdGroup({{ $value->id }})" style="cursor: pointer">
+                                <div class="chat_list_group {{ $value->id }}" onclick="getIdGroup({{ $value->id }} )" style="cursor: pointer">
                                     <div class="chat_people">
                                         <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
                                         <div class="chat_ib">
@@ -108,27 +108,7 @@
                             @endforeach
                         </div>
                     </div>
-                    <div class="headind_srch">
-                        <div class="recent_heading">
-                            <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                                <div class="received_msg">
-                                    <div class="received_withd_msg">
-                                        <a>Chat with : </a>
-                                        {{-- <span class="time_date"><i>Sent at: {{ $value->created_at->format('Y-m-d H:m:s') }}</i></span> --}}
-                                    </div>
-                                </div>
-                        </div>
-                        <div class="srch_bar">
-                            <div class="stylish-input-group">
-                                <input type="text" class="search-bar"  placeholder="Search" >
-                                <span class="input-group-addon">
-                                <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
                     <div class="mesgs">
-
                         <div class="msg_history">
                             <div id="chat">
                                 @foreach($my_messages as $value)
@@ -172,6 +152,7 @@
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 
         function getId(id) {
+            var start_id = $('#start_id').val();
             $.ajax({
                 method: 'GET', // Type of response and matches what we said in the route
                 url: '/getMess', // This is the url we gave in the route
@@ -182,6 +163,14 @@
                         // $('.container').remove()
                         $('#mmm').html(response.html);
                         $('#id_user_received').attr('value', id);
+                        $('.active_chat').addClass(start_id);
+                        $('.active_chat').removeClass('active_chat');
+                        $('.' + id + '.chat_list').addClass('active_chat');
+                        // $('#name').remove();
+                        // $('.received_withd_msg').append(<a id="name"></a>)
+                        
+
+
                 },
                 error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
                     console.log(JSON.stringify(jqXHR));
@@ -192,6 +181,8 @@
         };
 
         function getIdGroup(id) {
+            // alert(id);
+            var start_id = $('#start_id').val();
             $.ajax({
                 method: 'GET', // Type of response and matches what we said in the route
                 url: '/getMessGroup', // This is the url we gave in the route
@@ -203,8 +194,9 @@
                         $('#mmm').html(response.html);
                         $('#id_user_received').removeAttr('value', id);
                         $('#id_group').attr('value', id);
-                        $('#').removeAttr('value', id);
-
+                        $('.active_chat').addClass(start_id);
+                        $('.active_chat').removeClass('active_chat');
+                        $('.' + id +'.chat_list_group').addClass('active_chat');
                 },
                 error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
                     console.log(JSON.stringify(jqXHR));
@@ -215,24 +207,52 @@
         };
 
         $(document).on('click', '#send_chat', function() {
-            // var id = $('#start_id').val();
+            var start_id = $('#start_id').val();
             var id = $('#id_user_received').val();
             var id_group = $('#id_group').val();
             var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
             var id_user_send = $('#id_user_send').val();
             var message = $('#message').val();
-            $.ajax({
-                url: "/storeMess",
-                method: "POST",
-                data: { _token: CSRF_TOKEN, id: id, message: message, id_user_send: id_user_send, id_group: id_group},
-                success: function (response) {
-                    $("#mmm").html(response.html);
-                },
-                error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
-                    console.log(JSON.stringify(jqXHR));
-                    alert('Can not send message!');
-                }
-            });
+            // alert(id_group);
+            if(id_group){
+                // alert(id_group);
+                $.ajax({
+                    url: "/storeMess",
+                    method: "POST",
+                    data: { _token: CSRF_TOKEN, id: id, message: message, id_user_send: id_user_send, id_group: id_group},
+                    success: function (response) {
+                        $("#mmm").html(response.html);
+                        $('#id_group').attr('value', id);
+                        $('#id_user_received').attr('value', id);
+                        $('.active_chat').addClass(start_id);
+                        $('.active_chat').removeClass('active_chat');
+                        $('.' + id_group +'.chat_list_group').addClass('active_chat');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
+                        console.log(JSON.stringify(jqXHR));
+                        alert('Can not send message!');
+                    }
+                });
+            }else{
+                // alert(id_group);
+                $.ajax({
+                    url: "/storeMess",
+                    method: "POST",
+                    data: { _token: CSRF_TOKEN, id: id, message: message, id_user_send: id_user_send, id_group: id_group},
+                    success: function (response) {
+                        $("#mmm").html(response.html);
+                        $('#id_group').attr('value', id);
+                        $('#id_user_received').attr('value', id);
+                        $('.active_chat').addClass(start_id);
+                        $('.active_chat').removeClass('active_chat');
+                        $('.' + id + '.chat_list').addClass('active_chat');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
+                        console.log(JSON.stringify(jqXHR));
+                        alert('Can not send message!');
+                    }
+                });
+            }
         });
         Pusher.logToConsole = true;
             var pusher = new Pusher('4c7dc639409e505ada7d', {
@@ -252,18 +272,39 @@
                 var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
                 var id_user_send = $('#id_user_send').val();
                 // alert(data.content);
-                $.ajax({
-                    url: "/getMess2",
-                    method: "GET",
-                    data: { _token: CSRF_TOKEN, id: id, id_user_send: id_user_send , id_group: id_group},
-                    success: function (response) {
-                        $("#mmm").html(response.html);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
-                        console.log(JSON.stringify(jqXHR));
-                        alert('Can not send message!');
-                    }
-                });
+                if(id_group){
+                    $.ajax({
+                        url: "/getMess2",
+                        method: "GET",
+                        data: { _token: CSRF_TOKEN, id: id, id_user_send: id_user_send , id_group: id_group},
+                        success: function (response) {
+                            $("#mmm").html(response.html);
+                            $('.active_chat').addClass(start_id);
+                            $('.active_chat').removeClass('active_chat');
+                            $('.' + id_group +'.chat_list_group').addClass('active_chat');
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
+                            console.log(JSON.stringify(jqXHR));
+                            alert('Can not send message!');
+                        }
+                    });
+                }else{
+                    $.ajax({
+                        url: "/getMess2",
+                        method: "GET",
+                        data: { _token: CSRF_TOKEN, id: id, id_user_send: id_user_send , id_group: id_group},
+                        success: function (response) {
+                            $("#mmm").html(response.html);
+                            $('.active_chat').addClass(start_id);
+                            $('.active_chat').removeClass('active_chat');
+                            $('.' + id + '.chat_list').addClass('active_chat');
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) { // What to do if we fail
+                            console.log(JSON.stringify(jqXHR));
+                            alert('Can not send message!');
+                        }
+                    });
+                }
             });
     </script>
 @endsection
